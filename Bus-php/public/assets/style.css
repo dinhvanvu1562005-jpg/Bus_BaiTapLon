@@ -1,0 +1,22 @@
+body {
+  background: #f5f7fb;
+}
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #1f2a44;
+}
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+.card {
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+.table {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+}
