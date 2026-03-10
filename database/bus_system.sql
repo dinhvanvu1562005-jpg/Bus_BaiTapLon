@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 05, 2026 at 04:48 PM
+-- Generation Time: Mar 10, 2026 at 08:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -20,6 +20,39 @@ SET time_zone = "+00:00";
 --
 -- Database: `bus_system`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bookings`
+--
+
+CREATE TABLE `bookings` (
+  `id` int(11) NOT NULL,
+  `booking_code` varchar(30) NOT NULL,
+  `customer_name` varchar(100) NOT NULL,
+  `customer_phone` varchar(20) NOT NULL,
+  `customer_email` varchar(100) DEFAULT NULL,
+  `trip_id` int(11) NOT NULL,
+  `total_amount` int(11) NOT NULL DEFAULT 0,
+  `payment_status` enum('pending','paid','failed') NOT NULL DEFAULT 'pending',
+  `booking_status` enum('pending','confirmed','canceled') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `booking_seats`
+--
+
+CREATE TABLE `booking_seats` (
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `seat_no` int(11) NOT NULL,
+  `price` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -63,6 +96,23 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`id`, `full_name`, `phone`, `created_at`) VALUES
 (1, 'Đinh Văn Vũ', '0337804594', '2026-03-04 13:15:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payments`
+--
+
+CREATE TABLE `payments` (
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `payment_method` enum('cash','banking','momo','vnpay') NOT NULL DEFAULT 'cash',
+  `amount` int(11) NOT NULL,
+  `payment_status` enum('pending','paid','failed') NOT NULL DEFAULT 'pending',
+  `transaction_code` varchar(100) DEFAULT NULL,
+  `paid_at` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -170,6 +220,21 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `role`, `full_name`, `ph
 --
 
 --
+-- Indexes for table `bookings`
+--
+ALTER TABLE `bookings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `booking_code` (`booking_code`),
+  ADD KEY `fk_bookings_trip` (`trip_id`);
+
+--
+-- Indexes for table `booking_seats`
+--
+ALTER TABLE `booking_seats`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_booking_seats_booking` (`booking_id`);
+
+--
 -- Indexes for table `buses`
 --
 ALTER TABLE `buses`
@@ -182,6 +247,13 @@ ALTER TABLE `buses`
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uniq_phone` (`phone`);
+
+--
+-- Indexes for table `payments`
+--
+ALTER TABLE `payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_payments_booking` (`booking_id`);
 
 --
 -- Indexes for table `routes`
@@ -220,6 +292,18 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `bookings`
+--
+ALTER TABLE `bookings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `booking_seats`
+--
+ALTER TABLE `booking_seats`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `buses`
 --
 ALTER TABLE `buses`
@@ -230,6 +314,12 @@ ALTER TABLE `buses`
 --
 ALTER TABLE `customers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `payments`
+--
+ALTER TABLE `payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `routes`
@@ -258,6 +348,24 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `bookings`
+--
+ALTER TABLE `bookings`
+  ADD CONSTRAINT `fk_bookings_trip` FOREIGN KEY (`trip_id`) REFERENCES `trips` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `booking_seats`
+--
+ALTER TABLE `booking_seats`
+  ADD CONSTRAINT `fk_booking_seats_booking` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `fk_payments_booking` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `tickets`
