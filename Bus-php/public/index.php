@@ -1,7 +1,6 @@
 <?php
 // ✅ để session dùng được cho /public và /public/admin
 if (session_status() === PHP_SESSION_NONE) {
-  // cookie path theo thư mục hiện tại (public) để admin cũng nhận session
   $cookiePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\') . '/';
   session_set_cookie_params(['path' => $cookiePath]);
   session_start();
@@ -21,7 +20,7 @@ if (!empty($_SESSION['user_id']) && !empty($_SESSION['role'])) {
 // open modal
 $open = $_GET['open'] ?? ''; // login | register
 
-// ✅ Xử lý đăng nhập NGAY TẠI INDEX (post về chính index.php)
+// ✅ Xử lý đăng nhập NGAY TẠI INDEX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login') {
   $username = trim($_POST['username'] ?? "");
   $password = $_POST['password'] ?? "";
@@ -39,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
     header("Location: " . BASE_URL . "/admin/index.php");
     exit;
   } else {
-    // ✅ Hiện lỗi ngay trong modal
     $error = $result["message"] ?? "Sai tài khoản hoặc mật khẩu.";
     $open = 'login';
   }
@@ -88,10 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       box-shadow: 0 20px 60px rgba(0,0,0,.25);
       overflow: hidden;
     }
-    .search-card .form-control, .search-card .form-select {
+
+    .search-card .form-control,
+    .search-card .form-select {
       height: 54px;
       border-radius: 12px;
     }
+
     .btn-search {
       height: 54px;
       border-radius: 12px;
@@ -101,7 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       position: relative;
       overflow: hidden;
     }
-    .btn-search:hover { background:#b91c1c; }
+
+    .btn-search:hover {
+      background:#b91c1c;
+    }
 
     /* ===== Modal auth ===== */
     .auth-modal .modal-content{
@@ -110,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       overflow:hidden;
       box-shadow: 0 30px 80px rgba(2,6,23,.25);
     }
+
     .auth-left{
       background: linear-gradient(180deg,#ef4444,#b91c1c);
       color:#fff;
@@ -117,27 +122,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       min-height: 420px;
       position: relative;
     }
+
     .auth-left:after{
       content:"";
-      position:absolute; inset:-40px -60px auto auto;
-      width:220px; height:220px;
+      position:absolute;
+      inset:-40px -60px auto auto;
+      width:220px;
+      height:220px;
       background: rgba(255,255,255,.14);
       border-radius: 40px;
       transform: rotate(18deg);
     }
+
     .auth-right{
       padding: 26px;
       background:#fff;
     }
+
     .auth-title{
       font-weight: 900;
       letter-spacing:.2px;
     }
-    .auth-sub{ color:#64748b; font-size: 13px; }
+
+    .auth-sub{
+      color:#64748b;
+      font-size: 13px;
+    }
+
     .auth-right .form-control{
       height: 48px;
       border-radius: 12px;
     }
+
     .auth-btn{
       height: 48px;
       border-radius: 12px;
@@ -145,20 +161,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       background:#2563eb;
       border:0;
     }
-    .auth-btn:hover{ background:#1d4ed8; }
-    .auth-link{ color:#2563eb; text-decoration:none; font-weight:600; }
-    .auth-link:hover{ text-decoration:underline; }
 
-    /* =========================================================
-       ✅ NÂNG CẤP CHUYỂN ĐỘNG + PRO (CSS)
-       ========================================================= */
+    .auth-btn:hover{
+      background:#1d4ed8;
+    }
+
+    .auth-link{
+      color:#2563eb;
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    .auth-link:hover{
+      text-decoration:underline;
+    }
+
+    /* ===== Animation + Pro ===== */
     html { scroll-behavior: smooth; }
     body { overflow-x: hidden; }
 
-    /* overlay glow động nhẹ */
     .hero::before{
       content:"";
-      position:absolute; inset:0;
+      position:absolute;
+      inset:0;
       background:
         radial-gradient(900px 500px at 20% 20%, rgba(255,255,255,.12), transparent 60%),
         radial-gradient(700px 420px at 80% 30%, rgba(255,255,255,.10), transparent 65%);
@@ -168,56 +193,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       animation: floatGlow 8s ease-in-out infinite;
       z-index: 0;
     }
+
     @keyframes floatGlow{
       0%,100%{ transform: translate3d(0,0,0) scale(1); }
       50%{ transform: translate3d(0,-10px,0) scale(1.02); }
     }
 
-    /* đảm bảo content nằm trên overlay */
-    .hero .container, .hero-nav { position: relative; z-index: 1; }
+    .hero .container,
+    .hero-nav {
+      position: relative;
+      z-index: 1;
+    }
 
-    /* reveal animation */
-    .hero h1, .hero .text-white-75, .search-card{
+    .hero h1,
+    .hero .text-white-75,
+    .search-card{
       opacity: 0;
       transform: translateY(16px);
       transition: opacity .7s ease, transform .7s ease;
       will-change: opacity, transform;
     }
-    .hero.is-ready h1{ transition-delay: .05s; opacity:1; transform: translateY(0); }
-    .hero.is-ready .text-white-75{ transition-delay: .15s; opacity:1; transform: translateY(0); }
-    .hero.is-ready .search-card{ transition-delay: .25s; opacity:1; transform: translateY(0); }
 
-    /* nav fade-in */
+    .hero.is-ready h1{
+      transition-delay: .05s;
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    .hero.is-ready .text-white-75{
+      transition-delay: .15s;
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    .hero.is-ready .search-card{
+      transition-delay: .25s;
+      opacity:1;
+      transform: translateY(0);
+    }
+
     .hero-nav{
       transform: translateY(-10px);
       opacity: 0;
       transition: transform .6s ease, opacity .6s ease;
     }
+
     .hero.is-ready .hero-nav{
       transform: translateY(0);
       opacity: 1;
     }
 
-    /* card hover elevation */
     .search-card{
       transform-origin: center;
       transition: transform .25s ease, box-shadow .25s ease, opacity .7s ease;
     }
+
     .search-card:hover{
       transform: translateY(-2px);
       box-shadow: 0 26px 80px rgba(0,0,0,.32);
     }
 
-    /* input focus pro */
     .search-card .form-control:focus{
       box-shadow: 0 0 0 .25rem rgba(37,99,235,.18);
       border-color: rgba(37,99,235,.45);
     }
 
-    /* loading bar trên cùng */
     .top-loader{
       position: fixed;
-      left:0; top:0;
+      left:0;
+      top:0;
       height: 3px;
       width: 0%;
       background: linear-gradient(90deg, #60a5fa, #ef4444);
@@ -234,8 +278,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       <div class="container d-flex justify-content-between align-items-center">
         <div class="brand">🚌 Bus System</div>
         <div class="d-flex gap-2">
-          <a class="btn btn-light btn-sm fw-semibold" href="<?=BASE_URL?>/index.php?open=login">Đăng nhập</a>
-          <a class="btn btn-outline-light btn-sm fw-semibold" href="<?=BASE_URL?>/index.php?open=register">Đăng ký</a>
+          <a class="btn btn-light btn-sm fw-semibold" href="<?= BASE_URL ?>/index.php?open=login">Đăng nhập</a>
+          <a class="btn btn-outline-light btn-sm fw-semibold" href="<?= BASE_URL ?>/index.php?open=register">Đăng ký</a>
         </div>
       </div>
     </div>
@@ -247,23 +291,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
         <div class="text-white-75 mb-4">Tra cứu tuyến – lịch chạy – đặt vé</div>
 
         <div class="search-card p-3 p-md-4">
-          <form class="row g-3 align-items-center" onsubmit="return false;">
+          <!-- ✅ ĐÃ SỬA FORM TÌM CHUYẾN -->
+          <form class="row g-3 align-items-center" method="get" action="<?= BASE_URL ?>/search.php">
             <div class="col-md-4">
               <label class="form-label mb-1 text-muted">FROM</label>
-              <input class="form-control" placeholder="Ví dụ: HCM">
+              <input class="form-control" name="from_city" placeholder="Ví dụ: HCM" required>
             </div>
             <div class="col-md-4">
               <label class="form-label mb-1 text-muted">TO</label>
-              <input class="form-control" placeholder="Ví dụ: Nha Trang">
+              <input class="form-control" name="to_city" placeholder="Ví dụ: Nha Trang" required>
             </div>
             <div class="col-md-2">
               <label class="form-label mb-1 text-muted">DATE</label>
-              <input class="form-control" type="date">
+              <input class="form-control" type="date" name="depart_date">
             </div>
             <div class="col-md-2 d-grid">
               <label class="form-label mb-1 text-muted">&nbsp;</label>
-              <button type="button" class="btn btn-search text-white"
-                      onclick="window.location.href='<?=BASE_URL?>/index.php?open=login'">
+              <button type="submit" class="btn btn-search text-white">
                 SEARCH BUSES
               </button>
             </div>
@@ -300,8 +344,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
               </div>
             <?php endif; ?>
 
-            <!-- LOGIN FORM: post về chính index.php -->
-            <form id="loginForm" class="mt-3" method="post" action="<?=BASE_URL?>/index.php?open=login" autocomplete="off">
+            <!-- LOGIN FORM -->
+            <form id="loginForm" class="mt-3" method="post" action="<?= BASE_URL ?>/index.php?open=login" autocomplete="off">
               <input type="hidden" name="__form" value="login">
               <div class="mb-3">
                 <label class="form-label">Username</label>
@@ -313,13 +357,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
               </div>
               <button class="btn auth-btn text-white w-100" type="submit">Đăng nhập</button>
               <div class="d-flex justify-content-between mt-3 small">
-                <a class="auth-link" href="<?=BASE_URL?>/index.php?open=register">Tạo tài khoản</a>
-                <a class="text-muted text-decoration-none" href="<?=BASE_URL?>/index.php">Trang chủ</a>
+                <a class="auth-link" href="<?= BASE_URL ?>/index.php?open=register">Tạo tài khoản</a>
+                <a class="text-muted text-decoration-none" href="<?= BASE_URL ?>/index.php">Trang chủ</a>
               </div>
             </form>
 
             <!-- REGISTER FORM -->
-            <form id="registerForm" class="mt-3 d-none" method="post" action="<?=BASE_URL?>/register.php" autocomplete="off">
+            <form id="registerForm" class="mt-3 d-none" method="post" action="<?= BASE_URL ?>/register.php" autocomplete="off">
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label">Username</label>
@@ -340,8 +384,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
               </div>
               <button class="btn auth-btn text-white w-100 mt-3" type="submit">Đăng ký</button>
               <div class="d-flex justify-content-between mt-3 small">
-                <a class="auth-link" href="<?=BASE_URL?>/index.php?open=login">Đã có tài khoản</a>
-                <a class="text-muted text-decoration-none" href="<?=BASE_URL?>/index.php">Trang chủ</a>
+                <a class="auth-link" href="<?= BASE_URL ?>/index.php?open=login">Đã có tài khoản</a>
+                <a class="text-muted text-decoration-none" href="<?= BASE_URL ?>/index.php">Trang chủ</a>
               </div>
               <div class="text-muted small mt-2">* Đăng ký mặc định role = seller.</div>
             </form>
@@ -355,16 +399,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // =========================================================
-    // ✅ NÂNG CẤP CHUYỂN ĐỘNG + PRO (JS)
-    // =========================================================
-
     // reveal khi page load
     window.addEventListener('DOMContentLoaded', () => {
       document.querySelector('.hero')?.classList.add('is-ready');
     });
 
-    // parallax theo chuột (nhẹ)
+    // parallax theo chuột
     (function(){
       const hero = document.querySelector('.hero');
       if(!hero) return;
@@ -381,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       }, { passive: true });
     })();
 
-    // bonus: parallax theo scroll
+    // parallax theo scroll
     window.addEventListener('scroll', () => {
       const hero = document.querySelector('.hero');
       if(!hero) return;
@@ -389,7 +429,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       hero.style.backgroundPosition = `50% calc(50% + ${y}px)`;
     }, { passive: true });
 
-    // loader bar khi click open modal/login/register/search
+    // loader bar khi click open modal
     (function(){
       const loader = document.createElement('div');
       loader.className = 'top-loader';
@@ -401,9 +441,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
 
         const href = el.getAttribute('href') || '';
         const isNav = href.includes('?open=login') || href.includes('?open=register');
-        const isSearch = el.classList.contains('btn-search');
 
-        if(isNav || isSearch){
+        if(isNav){
           loader.style.width = '35%';
           setTimeout(() => loader.style.width = '70%', 120);
           setTimeout(() => loader.style.width = '100%', 250);
@@ -423,9 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       });
     })();
 
-    // =========================================================
-    // ✅ GIỮ LOGIC OPEN MODAL (login/register)
-    // =========================================================
+    // open modal login/register
     const open = <?= json_encode($open) ?>;
     const modalEl = document.getElementById('authModal');
 
@@ -435,6 +472,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
       document.getElementById('loginForm').classList.add('d-none');
       document.getElementById('registerForm').classList.remove('d-none');
     }
+
     function showLogin(){
       document.getElementById('authTitle').textContent = 'Đăng nhập';
       document.getElementById('authSub').textContent = 'Nhập tài khoản để vào hệ thống';
@@ -444,7 +482,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['__form'] ?? '') === 'login
 
     if (open === 'login' || open === 'register') {
       const m = new bootstrap.Modal(modalEl);
-      if (open === 'register') showRegister(); else showLogin();
+      if (open === 'register') {
+        showRegister();
+      } else {
+        showLogin();
+      }
       m.show();
     }
   </script>

@@ -2,7 +2,13 @@
 require_once __DIR__ . '/../../app/middleware/auth.php';
 require_once __DIR__ . '/../_base.php';
 
-require_role(['admin','dispatcher']); // dashboard cho admin + điều hành
+/**
+ * ✅ Cho cả 3 vai trò vào được dashboard
+ * - admin
+ * - dispatcher
+ * - seller
+ */
+require_role(['admin', 'dispatcher', 'seller']);
 
 require_once __DIR__ . '/../../app/config/database.php';
 require_once __DIR__ . '/_layout_top.php';
@@ -11,11 +17,12 @@ $pdo = Database::conn();
 
 /**
  * GHI CHÚ:
- * - Nếu bảng tickets của bạn có cột status (vd: 'booked','canceled') thì thêm điều kiện status != 'canceled'
- * - Nếu không có cột status thì bỏ điều kiện đó đi.
+ * - Nếu bảng tickets của bạn có cột status (vd: 'booked','canceled')
+ *   thì thêm điều kiện: WHERE status != 'canceled'
+ * - Nếu chưa có cột status thì giữ nguyên như dưới.
  */
 
-// 1) Tổng chuyến hôm nay (theo depart_at)
+// 1) Tổng chuyến hôm nay
 $st = $pdo->query("
   SELECT COUNT(*) AS c
   FROM trips
@@ -23,24 +30,21 @@ $st = $pdo->query("
 ");
 $todayTrips = (int)($st->fetch()['c'] ?? 0);
 
-// 2) Tổng vé đã bán (tính tất cả vé)
+// 2) Tổng vé đã bán
 $st = $pdo->query("
   SELECT COUNT(*) AS c
   FROM tickets
-  -- WHERE status != 'canceled'   -- bật nếu có cột status
 ");
 $ticketsSold = (int)($st->fetch()['c'] ?? 0);
 
-// 3) Doanh thu (sum price)
+// 3) Doanh thu
 $st = $pdo->query("
-  SELECT COALESCE(SUM(price),0) AS s
+  SELECT COALESCE(SUM(price), 0) AS s
   FROM tickets
-  -- WHERE status != 'canceled'   -- bật nếu có cột status
 ");
 $revenue = (int)($st->fetch()['s'] ?? 0);
 
-// 4) Danh sách chuyến sắp tới + tính còn trống
-// booked_count = số vé của trip đó
+// 4) Danh sách chuyến sắp tới
 $upcoming = $pdo->query("
   SELECT
     t.id,
@@ -52,11 +56,10 @@ $upcoming = $pdo->query("
     COALESCE(x.booked_count, 0) AS booked_count
   FROM trips t
   JOIN routes r ON r.id = t.route_id
-  JOIN buses  b ON b.id = t.bus_id
+  JOIN buses b ON b.id = t.bus_id
   LEFT JOIN (
     SELECT trip_id, COUNT(*) AS booked_count
     FROM tickets
-    -- WHERE status != 'canceled'     -- bật nếu có cột status
     GROUP BY trip_id
   ) x ON x.trip_id = t.id
   WHERE t.depart_at >= NOW()
@@ -72,12 +75,14 @@ $upcoming = $pdo->query("
       <div class="value"><?= (int)$todayTrips ?></div>
     </div>
   </div>
+
   <div class="col-md-4">
     <div class="card p-3 kpi">
       <div class="label">Tổng vé đã bán</div>
       <div class="value"><?= (int)$ticketsSold ?></div>
     </div>
   </div>
+
   <div class="col-md-4">
     <div class="card p-3 kpi">
       <div class="label">Doanh thu</div>
